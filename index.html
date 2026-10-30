@@ -1,4 +1,3 @@
-html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,9 +72,9 @@ html
             container.innerHTML = '';
             monthConfigs.forEach((cfg, idx) => {
                 const btn = document.createElement('button');
-                btn.className = `px-4 py-2 text-xs font-semibold rounded-full border transition tracking-wider ${idx === currentMonthIdx ? 'bg-rose-400 text-white border-rose-400 shadow-sm shadow-rose-200' : 'bg-white text-neutral-600 border-rose-100 hover:bg-rose-50/50'}`;
+                btn.className = "px-4 py-2 text-xs font-semibold rounded-full border transition tracking-wider " + (idx === currentMonthIdx ? 'bg-rose-400 text-white border-rose-400 shadow-sm shadow-rose-200' : 'bg-white text-neutral-600 border-rose-100 hover:bg-rose-50/50');
                 btn.innerText = cfg.label.toUpperCase();
-                btn.onclick = () => { currentMonthIdx = idx; initTabs(); renderCalendar(); };
+                btn.onclick = function() { currentMonthIdx = idx; initTabs(); renderCalendar(); };
                 container.appendChild(btn);
             });
         }
@@ -101,16 +100,16 @@ html
                 dayLabel.innerText = day;
                 dayDiv.appendChild(dayLabel);
 
-                const currentStr = `${cfg.year}-${String(cfg.month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const activeEvt = eventsData.find(e => currentStr >= e.start && currentStr <= e.end);
+                const currentStr = cfg.year + '-' + String(cfg.month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+                const activeEvt = eventsData.find(function(e) { return currentStr >= e.start && currentStr <= e.end; });
                 
                 if (activeEvt) {
-                    dayDiv.className = `h-16 border rounded-xl p-1.5 cursor-pointer transition transform hover:scale-[1.03] hover:shadow-sm flex flex-col justify-between ${activeEvt.color}`;
+                    dayDiv.className = "h-16 border rounded-xl p-1.5 cursor-pointer transition transform hover:scale-[1.03] hover:shadow-sm flex flex-col justify-between " + activeEvt.color;
                     const indicator = document.createElement('div');
                     indicator.className = "text-[9px] font-bold truncate leading-tight tracking-tight";
-                    indicator.innerText = rsvpState[activeEvt.id] ? `Selected: ${rsvpState[activeEvt.id]}` : activeEvt.name;
+                    indicator.innerText = rsvpState[activeEvt.id] ? "👑 " + rsvpState[activeEvt.id] : activeEvt.name;
                     dayDiv.appendChild(indicator);
-                    dayDiv.onclick = () => inspectEvent(activeEvt.id);
+                    dayDiv.onclick = function() { inspectEvent(activeEvt.id); };
                 }
 
                 grid.appendChild(dayDiv);
@@ -118,30 +117,29 @@ html
         }
 
         function inspectEvent(evtId) {
-            const evt = eventsData.find(e => e.id === evtId);
+            const evt = eventsData.find(function(e) { return e.id === evtId; });
             const panel = document.getElementById('details-panel');
             const status = rsvpState[evtId] || null;
 
-            panel.innerHTML = `
-                <div>
-                    <h3 class="text-xl font-serif font-bold text-neutral-900">${evt.name}</h3>
-                    <p class="text-xs text-rose-400 font-semibold mt-1">🗓️ Dates:
-                    📍 Location: ${evt.location}
-
-Description: ${evt.desc}
-
-Sleeping Accommodations: ${evt.bed}
-Au Pair Hours: ${evt.hours}
-
-
-
-${status === 'Attending' ? '✓ Attending' : 'Accept'}
-
-
-${status === 'Declined' ? '✕ Declined' : 'Decline'}
-
-
-`;
+            let htmlString = "<div>" +
+                "<h3 class=\"text-xl font-serif font-bold text-neutral-900\">" + evt.name + "</h3>" +
+                "<p class=\"text-xs text-rose-400 font-semibold mt-1\">🗓️ Dates: " + evt.start + " to " + evt.end + "</p>" +
+                "<p class="text-xs text-neutral-400 mt-0.5">📍 Location: " + evt.location + "" +
+"" +
+"<p class="text-neutral-600 text-xs leading-relaxed border-t border-neutral-100 pt-3">Description: " + evt.desc + "" +
+"<div class="space-y-2 border-t border-neutral-100 pt-3 text-xs">" +
+"<span class="font-bold text-neutral-700 block">Sleeping Accommodations: <span class="text-neutral-600">" + evt.bed + "" +
+"<span class="font-bold text-neutral-700 block">Au Pair Hours: <span class="text-neutral-600">" + evt.hours + "" +
+"" +
+"<div class="flex gap-2 border-t border-neutral-100 pt-4">" +
+"<button onclick="submitRSVP(" + evtId + ", 'Attending')" class="flex-1 py-2 text-xs font-semibold rounded-full border transition tracking-wider " + (status === 'Attending' ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-neutral-900 text-white hover:bg-neutral-800 border-neutral-900') + "">" +
+(status === 'Attending' ? '✓ Attending' : 'Accept') +
+"" +
+"<button onclick="submitRSVP(" + evtId + ", 'Declined')" class="flex-1 py-2 text-xs font-semibold rounded-full border transition tracking-wider " + (status === 'Declined' ? 'bg-rose-600 text-white border-rose-600' : 'bg-white text-neutral-700 border-neutral-200 hover:bg-neutral-50') + "">" +
+(status === 'Declined' ? '✕ Declined' : 'Decline') +
+"" +
+"";
+panel.innerHTML = htmlString;
 }
 function submitRSVP(evtId, stringStatus) {
 rsvpState[evtId] = stringStatus;
