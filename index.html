@@ -72,7 +72,7 @@
             container.innerHTML = '';
             monthConfigs.forEach((cfg, idx) => {
                 const btn = document.createElement('button');
-                btn.className = "px-4 py-2 text-xs font-semibold rounded-full border transition tracking-wider " + (idx === currentMonthIdx ? 'bg-rose-400 text-white border-rose-400 shadow-sm shadow-rose-200' : 'bg-white text-neutral-600 border-rose-100 hover:bg-rose-50/50');
+                btn.className = 'px-4 py-2 text-xs font-semibold rounded-full border transition tracking-wider ' + (idx === currentMonthIdx ? 'bg-rose-400 text-white border-rose-400 shadow-sm shadow-rose-200' : 'bg-white text-neutral-600 border-rose-100 hover:bg-rose-50/50');
                 btn.innerText = cfg.label.toUpperCase();
                 btn.onclick = function() { currentMonthIdx = idx; initTabs(); renderCalendar(); };
                 container.appendChild(btn);
@@ -87,16 +87,16 @@
 
             for (let i = 0; i < cfg.startDay; i++) {
                 const blank = document.createElement('div');
-                blank.className = "h-16 bg-transparent border border-transparent rounded-xl opacity-0";
+                blank.className = 'h-16 bg-transparent border border-transparent rounded-xl opacity-0';
                 grid.appendChild(blank);
             }
 
             for (let day = 1; day <= cfg.days; day++) {
                 const dayDiv = document.createElement('div');
-                dayDiv.className = "h-16 border border-neutral-100 rounded-xl p-1 bg-white/40 relative flex flex-col justify-between";
+                dayDiv.className = 'h-16 border border-neutral-100 rounded-xl p-1 bg-white/40 relative flex flex-col justify-between';
                 
                 const dayLabel = document.createElement('span');
-                dayLabel.className = "text-xs font-bold text-neutral-300 ml-1 mt-0.5";
+                dayLabel.className = 'text-xs font-bold text-neutral-300 ml-1 mt-0.5';
                 dayLabel.innerText = day;
                 dayDiv.appendChild(dayLabel);
 
@@ -104,10 +104,10 @@
                 const activeEvt = eventsData.find(function(e) { return currentStr >= e.start && currentStr <= e.end; });
                 
                 if (activeEvt) {
-                    dayDiv.className = "h-16 border rounded-xl p-1.5 cursor-pointer transition transform hover:scale-[1.03] hover:shadow-sm flex flex-col justify-between " + activeEvt.color;
+                    dayDiv.className = 'h-16 border rounded-xl p-1.5 cursor-pointer transition transform hover:scale-[1.03] hover:shadow-sm flex flex-col justify-between ' + activeEvt.color;
                     const indicator = document.createElement('div');
-                    indicator.className = "text-[9px] font-bold truncate leading-tight tracking-tight";
-                    indicator.innerText = rsvpState[activeEvt.id] ? "👑 " + rsvpState[activeEvt.id] : activeEvt.name;
+                    indicator.className = 'text-[9px] font-bold truncate leading-tight tracking-tight';
+                    indicator.innerText = rsvpState[activeEvt.id] ? '👑 ' + rsvpState[activeEvt.id] : activeEvt.name;
                     dayDiv.appendChild(indicator);
                     dayDiv.onclick = function() { inspectEvent(activeEvt.id); };
                 }
@@ -125,8 +125,7 @@
 
             const headerDiv = document.createElement('div');
             headerDiv.innerHTML = "<h3 class='text-xl font-serif font-bold text-neutral-900'>" + evt.name + "</h3>" +
-Use code with caution.
-"🗓️ Dates: " + evt.start + " to " + evt.end + "" +
+                "🗓️ Dates: " + evt.start + " to " + evt.end + "" +
 "📍 Location: " + evt.location + "";
 panel.appendChild(headerDiv);
 const descP = document.createElement('p');
@@ -146,7 +145,7 @@ acceptBtn.innerText = status === 'Attending' ? '✓ Attending' : 'Accept';
 acceptBtn.onclick = function() { submitRSVP(evtId, 'Attending'); };
 btnDiv.appendChild(acceptBtn);
 const declineBtn = document.createElement('button');
-declineBtn.className = "flex-1 py-2 text-xs font-semibold rounded-full border transition tracking-wider " + (status === 'Declined' ? 'bg-rose-600 text-white border-rose-600' : 'bg-white text-neutral-700 border-rose-200 hover:bg-slate-50');
+declineBtn.className = "flex-1 py-2 text-xs font-semibold rounded-full border transition tracking-wider " + (status === 'Declined' ? 'bg-rose-600 text-white border-rose-600' : 'bg-white text-neutral-700 border-neutral-200 hover:bg-rose-50/50');
 declineBtn.innerText = status === 'Declined' ? '✕ Declined' : 'Decline';
 declineBtn.onclick = function() { submitRSVP(evtId, 'Declined'); };
 btnDiv.appendChild(declineBtn);
@@ -159,6 +158,6 @@ renderCalendar();
 }
 initTabs();
 renderCalendar();
-            </script>
+         </script>
 </body>
 </html>
