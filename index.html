@@ -199,43 +199,36 @@ renderCalendar();
 }
 initTabs();
 renderCalendar();
- function submitRSVP(evtId, stringStatus) {
-            // Lock local state variables
+            function submitRSVP(evtId, stringStatus) {
             rsvpState[evtId] = stringStatus;
             inspectEvent(evtId);
             renderCalendar();
 
-            // Extract the chosen event profile data parameters
             const eventDetails = eventsData.find(function(e) { return e.id === evtId; });
 
             // ⚠️ REPLACE THE URL BELOW WITH YOUR COPIED ZAPIER WEBHOOK URL STRING
             const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/29297940/49im7pc/";
 
-            // Package the payload structure cleanly
-            const payload = {
-                eventName: eventDetails.name,
-                startDate: eventDetails.start,
-                endDate: eventDetails.end,
-                location: eventDetails.location,
-                hoursHandbookScope: eventDetails.hours,
-                lodgingSetup: eventDetails.bed,
-                auPairResponse: stringStatus,
-                timestampSubmitted: new Date().toISOString()
-            };
+            // Convert payload properties cleanly into url-encoded form values
+            const formData = new URLSearchParams();
+            formData.append('eventName', eventDetails.name);
+            formData.append('startDate', eventDetails.start);
+            formData.append('endDate', eventDetails.end);
+            formData.append('location', eventDetails.location);
+            formData.append('hoursHandbookScope', eventDetails.hours);
+            formData.append('lodgingSetup', eventDetails.bed);
+            formData.append('auPairResponse', stringStatus);
+            formData.append('timestampSubmitted', new Date().toISOString());
 
-            // Dispatch payload instantly to your Zapier webhook server receiver
+            // Dispatch using native url-encoded format to guarantee Zapier parses the text fields
             fetch(zapierWebhookUrl, {
                 method: "POST",
-                mode: "no-cors", // Prevents cross-origin browser security blocks
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: formData.toString()
             })
-            .then(function() { console.log("RSVP logged natively to Zapier pipeline."); })
-            .catch(function(err) { console.error("Network error executing hook:", err); });
+            .then(function() { console.log("RSVP safely captured by Zapier."); })
+            .catch(function(err) { console.error("Network tracking exception:", err); });
         }
-
-        initTabs();
-        renderCalendar();
     </script>
 </body>
 </html>
