@@ -199,6 +199,43 @@ renderCalendar();
 }
 initTabs();
 renderCalendar();
-            </script>
+ function submitRSVP(evtId, stringStatus) {
+            // Lock local state variables
+            rsvpState[evtId] = stringStatus;
+            inspectEvent(evtId);
+            renderCalendar();
+
+            // Extract the chosen event profile data parameters
+            const eventDetails = eventsData.find(function(e) { return e.id === evtId; });
+
+            // ⚠️ REPLACE THE URL BELOW WITH YOUR COPIED ZAPIER WEBHOOK URL STRING
+            const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/29297940/49im7pc/";
+
+            // Package the payload structure cleanly
+            const payload = {
+                eventName: eventDetails.name,
+                startDate: eventDetails.start,
+                endDate: eventDetails.end,
+                location: eventDetails.location,
+                hoursHandbookScope: eventDetails.hours,
+                lodgingSetup: eventDetails.bed,
+                auPairResponse: stringStatus,
+                timestampSubmitted: new Date().toISOString()
+            };
+
+            // Dispatch payload instantly to your Zapier webhook server receiver
+            fetch(zapierWebhookUrl, {
+                method: "POST",
+                mode: "no-cors", // Prevents cross-origin browser security blocks
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+            .then(function() { console.log("RSVP logged natively to Zapier pipeline."); })
+            .catch(function(err) { console.error("Network error executing hook:", err); });
+        }
+
+        initTabs();
+        renderCalendar();
+    </script>
 </body>
 </html>
