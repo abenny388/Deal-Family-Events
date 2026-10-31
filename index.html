@@ -171,9 +171,23 @@ descP.innerText = "Description: " + evt.desc;
 panel.appendChild(descP);
 const metaDiv = document.createElement('div');
 metaDiv.className = "panel-details-box";
-metaDiv.innerHTML = "Sleeping Accommodations: " + evt.bed + "" +
-"Au Pair Hours: " + evt.hours + "";
-panel.appendChild(metaDiv);
+// 3. Meta Details Box (With explicit block rows and spacing)
+            const metaDiv = document.createElement('div');
+            metaDiv.className = "panel-details-box";
+            
+            let detailsHtml = "";
+            detailsHtml += "<div class='details-row' style='margin-bottom: 16px; display: block;'>";
+            detailsHtml += "  <strong class='details-label' style='display: block; margin-bottom: 4px;'>Sleeping Accommodations:</strong>";
+            detailsHtml += "  <span class='details-val' style='display: block; color: #525252;'>" + evt.bed + "</span>";
+            detailsHtml += "</div>";
+            
+            detailsHtml += "<div class='details-row' style='margin-bottom: 16px; display: block;'>";
+            detailsHtml += "  <strong class='details-label' style='display: block; margin-bottom: 4px;'>Au Pair Hours:</strong>";
+            detailsHtml += "  <span class='details-val' style='display: block; color: #525252;'>" + evt.hours + "</span>";
+            detailsHtml += "</div>";
+            
+            metaDiv.innerHTML = detailsHtml;
+            panel.appendChild(metaDiv);
 const btnDiv = document.createElement('div');
 btnDiv.className = "btn-row";
 const acceptBtn = document.createElement('button');
