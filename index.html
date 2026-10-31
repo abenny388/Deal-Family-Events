@@ -50,17 +50,17 @@
         
         .inspector-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(4px); border: 1px solid #ffe4e6; border-radius: 16px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(251, 113, 133, 0.05); height: max-content; }
         .panel-placeholder { text-align: center; padding: 48px 0; color: #a3a3a3; font-size: 0.875rem; }
-        .panel-evt-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: #171717; margin: 0; }
-        .panel-meta { font-size: 0.75rem; color: #f43f5e; font-weight: 600; margin: 4px 0 0 0; }
-        .panel-loc { font-size: 0.75rem; color: #a3a3a3; margin: 2px 0 0 0; }
-        .panel-desc { font-size: 0.75rem; line-height: 1.6; color: #525252; border-top: 1px solid #f5f5f5; padding-top: 12px; margin-top: 12px; }
+        .panel-evt-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: #171717; margin: 0 0 8px 0; }
+        .panel-meta { font-size: 0.75rem; color: #f43f5e; font-weight: 600; margin: 4px 0; }
+        .panel-loc { font-size: 0.75rem; color: #6b7280; margin: 4px 0 12px 0; }
+        .panel-desc { font-size: 0.75rem; line-height: 1.6; color: #525252; border-top: 1px solid #f5f5f5; padding-top: 12px; margin-top: 12px; margin-bottom: 12px; }
         .panel-details-box { border-top: 1px solid #f5f5f5; padding-top: 12px; margin-top: 12px; font-size: 0.75rem; }
-        .details-row { margin-bottom: 8px; }
-        .details-label { font-weight: 700; color: #404040; display: block; margin-bottom: 2px; }
-        .details-val { color: #525252; }
+        .details-row { margin-bottom: 16px; display: block; }
+        .details-label { font-weight: 700; color: #404040; display: block; margin-bottom: 4px; }
+        .details-val { color: #525252; line-height: 1.5; display: block; }
         
         .btn-row { display: flex; gap: 8px; border-top: 1px solid #f5f5f5; padding-top: 16px; margin-top: 16px; }
-        .btn-main { flex: 1; border: none; padding: 8px 16px; font-size: 0.75rem; font-weight: 600; border-radius: 9999px; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .btn-main { flex: 1; border: none; padding: 10px 16px; font-size: 0.75rem; font-weight: 600; border-radius: 9999px; cursor: pointer; transition: all 0.2s; text-align: center; }
         .btn-accept { background: #171717; color: #ffffff; }
         .btn-accept:hover { background: #262626; }
         .btn-decline { background: #ffffff; color: #404040; border: 1px solid #e5e5e5; }
@@ -104,7 +104,7 @@
             { id: 4, name: "Tahoe", start: "2027-01-21", end: "2027-01-24", colorClass: "evt-tahoe", location: "South Lake Tahoe", desc: "Andy and Alyssa will host friends for a ski weekend", bed: "Spare bedroom available", hours: "Childcare is needed Thursday and Friday. Alternative arrangements can be made if you want to take PTO these days instead of traveling." },
             { id: 5, name: "Tahoe", start: "2027-02-04", end: "2027-02-07", colorClass: "evt-tahoe", location: "South Lake Tahoe", desc: "Andy and Alyssa will host friends for a ski weekend", bed: "Spare bedroom available", hours: "Childcare is needed Thursday and Friday. Alternative childcare arrangements can be made if you want to take PTO these days instead of traveling." },
             { id: 6, name: "Tahoe", start: "2027-03-18", end: "2027-03-25", colorClass: "evt-tahoe", location: "South Lake Tahoe", desc: "Andy and Alyssa will host friends for a ski week", bed: "Spare bedroom available", hours: "Childcare is needed Th, Fri, Mon, Tue, Wed, and part of Thurs. Alternative childcare arrangements can be made if you want to take PTO these days instead of traveling." }
-        ];
+];
 const monthConfigs = [
 { label: "Nov 2026", year: 2026, month: 10, days: 30, startDay: 0 },
 { label: "Dec 2026", year: 2026, month: 11, days: 31, startDay: 2 },
@@ -161,9 +161,18 @@ const panel = document.getElementById('details-panel');
 const status = rsvpState[evtId] || null;
 panel.innerHTML = '';
 const headerDiv = document.createElement('div');
-headerDiv.innerHTML = "" + evt.name + "" +
-"🗓️ Dates: " + evt.start + " to " + evt.end + "" +
-"📍 Location: " + evt.location + "";
+const titleH3 = document.createElement('h3');
+titleH3.className = 'panel-evt-title';
+titleH3.innerText = evt.name;
+headerDiv.appendChild(titleH3);
+const dateP = document.createElement('p');
+dateP.className = 'panel-meta';
+dateP.innerText = "🗓️ Dates: " + evt.start + " to " + evt.end;
+headerDiv.appendChild(dateP);
+const locP = document.createElement('p');
+locP.className = 'panel-loc';
+locP.innerText = "📍 Location: " + evt.location;
+headerDiv.appendChild(locP);
 panel.appendChild(headerDiv);
 const descP = document.createElement('p');
 descP.className = "panel-desc";
@@ -171,23 +180,16 @@ descP.innerText = "Description: " + evt.desc;
 panel.appendChild(descP);
 const metaDiv = document.createElement('div');
 metaDiv.className = "panel-details-box";
-// 3. Meta Details Box (With explicit block rows and spacing)
-            const metaDiv = document.createElement('div');
-            metaDiv.className = "panel-details-box";
-            
-            let detailsHtml = "";
-            detailsHtml += "<div class='details-row' style='margin-bottom: 16px; display: block;'>";
-            detailsHtml += "  <strong class='details-label' style='display: block; margin-bottom: 4px;'>Sleeping Accommodations:</strong>";
-            detailsHtml += "  <span class='details-val' style='display: block; color: #525252;'>" + evt.bed + "</span>";
-            detailsHtml += "</div>";
-            
-            detailsHtml += "<div class='details-row' style='margin-bottom: 16px; display: block;'>";
-            detailsHtml += "  <strong class='details-label' style='display: block; margin-bottom: 4px;'>Au Pair Hours:</strong>";
-            detailsHtml += "  <span class='details-val' style='display: block; color: #525252;'>" + evt.hours + "</span>";
-            detailsHtml += "</div>";
-            
-            metaDiv.innerHTML = detailsHtml;
-            panel.appendChild(metaDiv);
+// Safe independent block generators to preserve spacing
+const row1 = document.createElement('div');
+row1.className = 'details-row';
+row1.innerHTML = "Sleeping Accommodations:" + evt.bed + "";
+metaDiv.appendChild(row1);
+const row2 = document.createElement('div');
+row2.className = 'details-row';
+row2.innerHTML = "Au Pair Hours:" + evt.hours + "";
+metaDiv.appendChild(row2);
+panel.appendChild(metaDiv);
 const btnDiv = document.createElement('div');
 btnDiv.className = "btn-row";
 const acceptBtn = document.createElement('button');
@@ -210,39 +212,28 @@ function submitRSVP(evtId, stringStatus) {
 rsvpState[evtId] = stringStatus;
 inspectEvent(evtId);
 renderCalendar();
+const eventDetails = eventsData.find(function(e) { return e.id === evtId; });
+// ⚠️ REPLACE THE URL BELOW WITH YOUR COPIED ZAPIER WEBHOOK URL STRING
+const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/29297940/49im7pc/";
+const formData = new URLSearchParams();
+formData.append('eventName', eventDetails.name);
+formData.append('startDate', eventDetails.start);
+formData.append('endDate', eventDetails.end);
+formData.append('location', eventDetails.location);
+formData.append('hoursHandbookScope', eventDetails.hours);
+formData.append('lodgingSetup', eventDetails.bed);
+formData.append('auPairResponse', stringStatus);
+formData.append('timestampSubmitted', new Date().toISOString());
+fetch(zapierWebhookUrl, {
+method: "POST",
+headers: { "Content-Type": "application/x-www-form-urlencoded" },
+body: formData.toString()
+})
+.then(function() { console.log("RSVP safely captured by Zapier."); })
+.catch(function(err) { console.error("Network tracking exception:", err); });
 }
 initTabs();
 renderCalendar();
-            function submitRSVP(evtId, stringStatus) {
-            rsvpState[evtId] = stringStatus;
-            inspectEvent(evtId);
-            renderCalendar();
-
-            const eventDetails = eventsData.find(function(e) { return e.id === evtId; });
-
-            // ⚠️ REPLACE THE URL BELOW WITH YOUR COPIED ZAPIER WEBHOOK URL STRING
-            const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/29297940/49im7pc/";
-
-            // Convert payload properties cleanly into url-encoded form values
-            const formData = new URLSearchParams();
-            formData.append('eventName', eventDetails.name);
-            formData.append('startDate', eventDetails.start);
-            formData.append('endDate', eventDetails.end);
-            formData.append('location', eventDetails.location);
-            formData.append('hoursHandbookScope', eventDetails.hours);
-            formData.append('lodgingSetup', eventDetails.bed);
-            formData.append('auPairResponse', stringStatus);
-            formData.append('timestampSubmitted', new Date().toISOString());
-
-            // Dispatch using native url-encoded format to guarantee Zapier parses the text fields
-            fetch(zapierWebhookUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: formData.toString()
-            })
-            .then(function() { console.log("RSVP safely captured by Zapier."); })
-            .catch(function(err) { console.error("Network tracking exception:", err); });
-        }
-    </script>
+       </script>
 </body>
-</html>
+</html>     
