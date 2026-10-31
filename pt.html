@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Eventos do Calendário da Família Deal</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #fffafb;
+            background-image: radial-gradient(rgba(217, 70, 239, 0.04) 1px, transparent 0);
+            background-size: 24px 24px;
+            margin: 0;
+            padding: 16px;
+            color: #404040;
+            -webkit-text-size-adjust: 100%;
+        }
+        .max-w-5xl { max-w: 1024px; margin: 0 auto; }
+        header { border-b: 1px solid #ffe4e6; padding-bottom: 16px; margin-bottom: 24px; }
+        h1 { font-family: 'Playfair Display', serif; font-size: 1.75rem; font-weight: 700; color: #171717; margin: 0; line-height: 1.2; }
+        .subtitle { color: #737373; margin-top: 8px; font-size: 0.875rem; line-height: 1.4; }
+        
+        .month-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; justify-content: flex-start; }
+        .tab-btn { 
+            background: #ffffff; border: 1px solid #ffe4e6; padding: 10px 16px; 
+            font-size: 0.75rem; font-weight: 600; border-radius: 9999px; cursor: pointer; 
+            letter-spacing: 0.05em; text-transform: uppercase; transition: all 0.2s;
+            min-height: 40px;
+        }
+        .tab-btn.active { background: #f43f5e; color: #ffffff; border-color: #f43f5e; box-shadow: 0 4px 6px -1px rgba(244, 63, 94, 0.2); }
+        
+        .layout-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+        
+        .calendar-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(4px); border: 1px solid #ffe4e6; border-radius: 16px; padding: 16px; box-shadow: 0 4px 6px -1px rgba(251, 113, 133, 0.05); overflow-x: auto; }
+        .calendar-title { font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 700; color: #171717; margin: 0 0 16px 0; border-bottom: 1px solid #f5f5f5; padding-bottom: 8px; }
+        .weekdays-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-size: 0.7rem; font-weight: 700; color: #f43f5e; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        
+        .day-cell { min-height: 56px; border: 1px solid #ffe4e6; border-radius: 8px; padding: 4px; background: rgba(255, 255, 255, 0.5); display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box; position: relative; }
+        .day-num { font-size: 0.7rem; font-weight: 700; color: #cbd5e1; }
+        .blank-cell { opacity: 0; pointer-events: none; }
+        
+        .evt-hawaii { background: #f0fdfa; border: 1px solid #99f6e4; color: #115e59; cursor: pointer; }
+        .evt-thanksgiving { background: #fff5f5; border: 1px solid #fee2e2; color: #991b1b; cursor: pointer; }
+        .evt-christmas { background: #fdf4ff; border: 1px solid #f3e8ff; color: #6b21a8; cursor: pointer; }
+        .evt-newyear { background: #eef2ff; border: 1px solid #e0e7ff; color: #3730a3; cursor: pointer; }
+        .evt-tahoe { background: #fffbeb; border: 1px solid #fef3c7; color: #92400e; cursor: pointer; }
+        .evt-label { font-size: 8px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: auto; width: 100%; text-align: center; background: rgba(255,255,255,0.6); padding: 1px 0; border-radius: 3px; }
+        
+        .inspector-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(4px); border: 1px solid #ffe4e6; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px -1px rgba(251, 113, 133, 0.05); height: max-content; }
+        .panel-placeholder { text-align: center; padding: 32px 0; color: #a3a3a3; font-size: 0.875rem; font-style: italic; }
+        .panel-evt-title { font-family: 'Playfair Display', serif; font-size: 1.25rem; font-weight: 700; color: #171717; margin: 0 0 6px 0; }
+        .panel-meta { font-size: 0.75rem; color: #f43f5e; font-weight: 600; margin: 4px 0; }
+        .panel-loc { font-size: 0.75rem; color: #6b7280; margin: 4px 0 12px 0; }
+        .panel-desc { font-size: 0.8rem; line-height: 1.5; color: #525252; border-top: 1px solid #f5f5f5; padding-top: 12px; margin-top: 12px; margin-bottom: 12px; }
+        .panel-details-box { border-top: 1px solid #f5f5f5; padding-top: 12px; margin-top: 12px; font-size: 0.8rem; }
+        .details-row { margin-bottom: 14px; display: block; }
+        .details-label { font-weight: 700; color: #404040; display: block; margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.02em; }
+        .details-val { color: #525252; line-height: 1.4; display: block; }
+        
+        .btn-row { display: flex; gap: 10px; border-top: 1px solid #f5f5f5; padding-top: 16px; margin-top: 16px; }
+        .btn-main { flex: 1; border: none; padding: 12px 16px; font-size: 0.8rem; font-weight: 600; border-radius: 9999px; cursor: pointer; text-align: center; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+        .btn-accept { background: #171717; color: #ffffff; }
+        .btn-decline { background: #ffffff; color: #404040; border: 1px solid #e5e5e5; }
+        .btn-state-accept { background: #10b981 !important; color: #ffffff !important; border: none !important; }
+        .btn-state-decline { background: #f43f5e !important; color: #ffffff !important; border: none !important; }
+
+        @media (min-width: 768px) {
+            body { padding: 32px; }
+            h1 { font-size: 2.25rem; }
+            .calendar-card { padding: 24px; }
+            .day-cell { min-height: 72px; padding: 8px; }
+            .evt-label { font-size: 9px; text-align: left; background: transparent; padding: 0; }
+        }
+        @media (min-width: 1024px) { 
+            .layout-grid { grid-template-columns: 2fr 1fr; gap: 32px; } 
+        }
+    </style>
+</head>
+<body>
+    <div class="max-w-5xl">
+        <header>
+            <h1>Eventos do Calendário da Família Deal</h1>
+            <div class="subtitle">Visualização do Calendário Interativo. Selecione um bloco de data de evento para revisar detalhes de acomodação, expectativas de horários da au pair e enviar sua resposta.</div>
+        </header>
+
+        <div class="month-tabs" id="month-tabs"></div>
+
+        <div class="layout-grid">
+            <div class="calendar-card">
+                <h2 id="calendar-month-title" class="calendar-title"></h2>
+                <div class="weekdays-header">
+                    <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+                </div>
+                <div class="days-grid" id="calendar-days-grid"></div>
+            </div>
+
+            <div class="inspector-card" id="details-panel">
+                <div class="panel-placeholder">
+                    ℹ️ Clique ou toque em um bloco de evento colorido no calendário para gerenciar seu status.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const eventsData = [
+            { id: 0, name: "Deal Family Trip to Hawaii", start: "2026-11-07", end: "2026-11-14", colorClass: "evt-hawaii", location: "Maui, Hawaii", desc: "Nós vamos nos juntar à família do Andy para um pouco de diversão no sol - a família adora nadar, mergulhar de snorkel, fazer trilhas e relaxar na praia. Esta será uma boa oportunidade para vivenciar a cultura americana e praticar seu inglês.", bed: "Quarto de hóspedes disponível", hours: "De segunda a sexta-feira estão listados como “dias bônus” no manual da família - o suporte de cuidados com as crianças não é necessário para este evento." },
+            { id: 1, name: "Thanksgiving Weekend", start: "2026-11-26", end: "2026-11-29", colorClass: "evt-thanksgiving", location: "The Benny House, Roseville CA", desc: "Os pais da Alyssa recebem amigos e familiares para um banquete delicioso, incluindo o tradicional peru assado, recheio e outros acompanhamentos tradicionais.", bed: "Quarto de hóspedes disponível", hours: "Quinta e sexta-feira estão listados como “dias bônus” no manual da família - o suporte de cuidados com as crianças não é necessário para este evento." },
+            { id: 2, name: "Christmas in Healdsburg", start: "2026-12-24", end: "2026-12-25", colorClass: "evt-christmas", location: "The Deal House, Healdsburg CA", desc: "Os pais do Andy recebem amigos e familiares para um jantar de véspera de Natal, incluindo tortellini em caldo e outros pratos italianos.", bed: "Sem quarto de hóspedes, apenas sofá disponível", hours: "Quinta e sexta-feira estão listados como “dias bônus” no manual da família - o suporte de cuidados com as crianças não é necessário para este evento." },
+            { id: 3, name: "New Years in Dillon Beach", start: "2026-12-31", end: "2027-01-03", colorClass: "evt-newyear", location: "Beach House Rental", desc: "Os pais do Andy se juntam a amigos e familiares para uma viagem aconchegante de inverno na praia. Há muitos cachorros, caminhadas à beira da água, quebra-cabeças e jogos de tabuleiro.", bed: "Sem quarto de hóspedes, apenas sofá disponível", hours: "Sexta-feira está listada como um “dia bônus” no manual da família - o suporte de cuidados com as crianças é necessário na quinta-feira antes de viajarmos." },
+{ id: 4, name: "Tahoe", start: "2027-01-21", end: "2027-01-24", colorClass: "evt-tahoe", location: "South Lake Tahoe", desc: "Andy e Alyssa vão receber amigos para um fim de semana de esqui", bed: "Quarto de hóspedes disponível", hours: "O cuidado com as crianças é necessário na quinta e na sexta-feira. Arranjos alternativos podem ser feitos se você quiser tirar folga (PTO) nesses dias em vez de viajar." },
+{ id: 5, name: "Tahoe", start: "2027-02-04", end: "2027-02-07", colorClass: "evt-tahoe", location: "South Lake Tahoe", desc: "Andy e Alyssa vão receber amigos para um fim de semana de esqui", bed: "Quarto de hóspedes disponível", hours: "O cuidado com as crianças é necessário na quinta e na sexta-feira. Arranjos alternativos de cuidados com as crianças podem ser feitos se você quiser tirar folga (PTO) nesses dias em vez de viajar." },
+{ id: 6, name: "Tahoe", start: "2027-03-18", end: "2027-03-25", colorClass: "evt-tahoe", location: "South Lake Tahoe", desc: "Andy e Alyssa vão receber amigos para uma semana de esqui", bed: "Quarto de hóspedes disponível", hours: "O cuidado com as crianças é necessário na Qui, Sex, Seg, Ter, Qua e parte da Qui. Arranjos alternativos de cuidados com as crianças podem ser feitos se você quiser tirar folga (PTO) nesses dias em vez de viajar." }
+];
+const monthConfigs = [
+{ label: "Nov 2026", year: 2026, month: 10, days: 30, startDay: 0 },
+{ label: "Dez 2026", year: 2026, month: 11, days: 31, startDay: 2 },
+{ label: "Jan 2027", year: 2027, month: 0,  days: 31, startDay: 5 },
+{ label: "Fev 2027", year: 2027, month: 1,  days: 28, startDay: 1 },
+{ label: "Mar 2027", year: 2027, month: 2,  days: 31, startDay: 1 }
+];
+let rsvpState = {};
+let currentMonthIdx = 0;
+function initTabs() {
+const container = document.getElementById('month-tabs');
+container.innerHTML = '';
+monthConfigs.forEach((cfg, idx) => {
+const btn = document.createElement('button');
+btn.className = 'tab-btn' + (idx === currentMonthIdx ? ' active' : '');
+btn.innerText = cfg.label;
+btn.onclick = function() { currentMonthIdx = idx; initTabs(); renderCalendar(); };
+container.appendChild(btn);
+});
+}
+function renderCalendar() {
+const cfg = monthConfigs[currentMonthIdx];
+document.getElementById('calendar-month-title').innerText = cfg.label;
+const grid = document.getElementById('calendar-days-grid');
+grid.innerHTML = '';
+for (let i = 0; i < cfg.startDay; i++) {
+const blank = document.createElement('div');
+blank.className = 'day-cell blank-cell';
+grid.appendChild(blank);
+}
+for (let day = 1; day <= cfg.days; day++) {
+const dayDiv = document.createElement('div');
+dayDiv.className = 'day-cell';
+const dayLabel = document.createElement('span');
+dayLabel.className = 'day-num';
+dayLabel.innerText = day;
+dayDiv.appendChild(dayLabel);
+const currentStr = cfg.year + '-' + String(cfg.month + 1).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+const activeEvt = eventsData.find(function(e) { return currentStr >= e.start && currentStr <= e.end; });
+if (activeEvt) {
+dayDiv.className = 'day-cell ' + activeEvt.colorClass;
+const indicator = document.createElement('div');
+indicator.className = 'evt-label';
+indicator.innerText = rsvpState[activeEvt.id] ? '👑 ' + rsvpState[activeEvt.id] : activeEvt.name;
+dayDiv.appendChild(indicator);
+dayDiv.onclick = function() { inspectEvent(activeEvt.id); };
+}
+grid.appendChild(dayDiv);
+}
+}
+function inspectEvent(evtId) {
+const evt = eventsData.find(function(e) { return e.id === evtId; });
+const panel = document.getElementById('details-panel');
+const status = rsvpState[evtId] || null;
+panel.innerHTML = '';
+const headerDiv = document.createElement('div');
+const titleH3 = document.createElement('h3');
+titleH3.className = 'panel-evt-title';
+titleH3.innerText = evt.name;
+headerDiv.appendChild(titleH3);
+const dateP = document.createElement('p');
+dateP.className = 'panel-meta';
+dateP.innerText = "🗓️ Datas: " + evt.start + " a " + evt.end;
+headerDiv.appendChild(dateP);
+const locP = document.createElement('p');
+locP.className = 'panel-loc';
+locP.innerText = "📍 Local: " + evt.location;
+headerDiv.appendChild(locP);
+panel.appendChild(headerDiv);
+const descP = document.createElement('p');
+descP.className = "panel-desc";
+descP.innerText = "Descrição: " + evt.desc;
+panel.appendChild(descP);
+const metaDiv = document.createElement('div');
+metaDiv.className = "panel-details-box";
+const row1 = document.createElement('div');
+row1.className = 'details-row';
+row1.innerHTML = "Acomodações de Dormir:" + evt.bed + "";
+metaDiv.appendChild(row1);
+const row2 = document.createElement('div');
+row2.className = 'details-row';
+row2.innerHTML = "Horários da Au Pair:" + evt.hours + "";
+metaDiv.appendChild(row2);
+panel.appendChild(metaDiv);
+const btnDiv = document.createElement('div');
+btnDiv.className = "btn-row";
+const acceptBtn = document.createElement('button');
+acceptBtn.className = "btn-main " + (status === 'Confirmado' ? 'btn-state-accept' : 'btn-accept');
+acceptBtn.innerText = status === 'Confirmado' ? '✓ Confirmado' : 'Aceitar';
+if (status !== 'Confirmado') {
+acceptBtn.onclick = function() { submitRSVP(evtId, 'Confirmado'); };
+}
+btnDiv.appendChild(acceptBtn);
+const declineBtn = document.createElement('button');
+declineBtn.className = "btn-main " + (status === 'Recusado' ? 'btn-state-decline' : 'btn-decline');
+declineBtn.innerText = status === 'Recusado' ? '✕ Recusado' : 'Recusar';
+if (status !== 'Recusado') {
+declineBtn.onclick = function() { submitRSVP(evtId, 'Recusado'); };
+}
+btnDiv.appendChild(declineBtn);
+panel.appendChild(btnDiv);
+panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function submitRSVP(evtId, stringStatus) {
+rsvpState[evtId] = stringStatus;
+inspectEvent(evtId);
+renderCalendar();
+const eventDetails = eventsData.find(function(e) { return e.id === evtId; });
+const zapierWebhookUrl = "https://hooks.zapier.com/hooks/catch/29297940/49im7pc/";
+const formData = new URLSearchParams();
+formData.append('eventName', eventDetails.name);
+formData.append('startDate', eventDetails.start);
+formData.append('endDate', eventDetails.end);
+formData.append('location', eventDetails.location);
+formData.append('hoursHandbookScope', eventDetails.hours);
+formData.append('lodgingSetup', eventDetails.bed);
+// Converts Brazilian labels back to English values so Zapier's JavaScript handles the logic correctly
+const englishStatus = stringStatus === 'Confirmado' ? 'Attending' : 'Declined';
+formData.append('auPairResponse', englishStatus);
+formData.append('timestampSubmitted', new Date().toISOString());
+fetch(zapierWebhookUrl, {
+method: "POST",
+headers: { "Content-Type": "application/x-www-form-urlencoded" },
+body: formData.toString()
+})
+.then(function() { console.log("RSVP logged successfully."); })
+.catch(function(err) { console.error("Network error:", err); });
+}
+initTabs();
+renderCalendar();
+ </script>
+</body>
+</html>             
